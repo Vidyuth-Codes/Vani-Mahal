@@ -49,6 +49,8 @@ function Login() {
                     <input id="email-input" type="email" placeholder='Email Here' value={email} onChange={(e) => setEmail(e.target.value)} required />
                     <label htmlFor="password-input">Enter Your Password</label>
                     <input id="password-input" type="password" placeholder='Password Here' value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <br></br>
+                    <br></br>
                     <button id='submit' type="submit" disabled={isSubmitting}>
                         {isSubmitting ? 'Logging in...' : 'Log In'}
                     </button>
