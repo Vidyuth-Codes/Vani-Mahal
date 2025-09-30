@@ -1,0 +1,437 @@
+/* Global styles for the entire application */
+/* --- THEME COLOR VARIABLES --- */
+/* Light Theme (Default) */
+:root {
+  --background-color: #f0f2f5;
+  --container-bg: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #606770;
+  --border-color: #dddfe2;
+  --input-bg: #ffffff;
+  --input-focus-border: #1877f2;
+  --button-primary-bg: #1877f2;
+}
+
+/* Dark Theme */
+body.dark-theme {
+  --background-color: #18191a;
+  --container-bg: #242526;
+  --text-primary: #ffffff;
+  --text-secondary: #ffffff;
+  --border-color: #3e4042;
+  --input-bg: #3a3b3c;
+  --input-focus-border: #4a90e2;
+  --button-primary-bg: #2d88ff;
+}
+/* --- END OF THEME VARIABLES --- */
+
+
+/* Update the body to use the new variables */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color); /* USE VARIABLE */
+  color: var(--text-primary); /* USE VARIABLE */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+/* Styles for the main container of the login page */
+#main-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Make sure it takes full screen height */
+  padding: 20px;
+  box-sizing: border-box; /* Ensures padding doesn't add to the width/height */
+}
+
+/* Styles for the main heading */
+
+
+/* --- Form specific styles --- */
+/* A container for the form elements for better spacing */
+#main-div > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Adds space between each form element */
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for the labels (email, password) */
+label {
+  font-weight: 600;
+  text-align: left;
+  color: #4b4f56;
+}
+
+/* Styles for the input fields */
+input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Important for padding to not break layout */
+}
+
+input:focus {
+  outline: none;
+  border-color: #1877f2; /* Highlight input on click */
+  box-shadow: 0 0 0 2px #e7f3ff;
+}
+
+/* Styles for the login button */
+#submit {
+  width: 100%;
+  padding: 14px;
+  background-color: #1877f2; /* A nice blue color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+#submit:hover {
+  background-color: #166fe5; /* A slightly darker blue on hover */
+}
+
+.home-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--container-bg);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.home-header {
+  padding: 20px;
+  text-align: center;
+}
+
+.home-header h1 {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.home-header p {
+  color: #606770;
+  font-size: 1.1rem;
+}
+.header-buttons {
+  position: fixed;
+  top: 50px;
+  right: 50px;
+  display: flex;
+  flex-direction: column; /* This is the key change to stack buttons vertically */
+  gap: 100px;              /* Adjust this value for desired spacing */
+}
+
+
+.checker-container h2 {
+    margin-bottom: 1.5rem;
+    color: #4b4f56;
+}
+
+.date-time-picker {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 2rem;
+  flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.input-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #4b4f56;
+}
+
+.input-group input {
+  padding: 10px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.check-button {
+  padding: 12px 24px;
+  background-color: #00a400; /* A nice green color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.check-button:hover {
+  background-color: #008c00;
+}
+
+.results-section {
+    margin-top: 2rem;
+}
+
+.result-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 5px solid;
+    text-align: left;
+}
+
+.result-card h3 {
+    margin-top: 0;
+}
+
+.result-card.available {
+    background-color: #e7f3ff;
+    border-color: #1877f2;
+    color: #1877f2;
+}
+
+.result-card.booked {
+    background-color: #fbebe7;
+    border-color: #db3422;
+    color: #db3422;
+}
+
+.result-card.error {
+    background-color: #fffbe2;
+    border-color: #f7b928;
+    color: #f7b928;
+}
+
+.contact-info {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.admin-container {
+  width: 95%;
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.admin-header {
+  text-align: center;
+  border-bottom: 1px solid #dddfe2;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.admin-header p {
+  color: #606770;
+  font-size: 1.1rem;
+}
+.logout-button {
+    border: 1px solid var(--border-color);
+    background-color: var(--container-bg);
+    color: var(--text-primary);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin-right: 150px;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    
+    
+}
+.logout-button:hover {
+    background-color: #ffffff;
+    color: black;
+    font-weight: bold;
+}
+
+.admin-content {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr; /* Two columns, list is slightly wider */
+  gap: 2rem;
+}
+
+/* --- Form Section Styles --- */
+.form-section, .list-section {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.form-section h2, .list-section h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #dddfe2;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: #4b4f56;
+}
+
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-group {
+  flex: 1; /* Each group takes equal space in a row */
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #4b4f56;
+}
+
+.form-group input {
+  padding: 12px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.schedule-button {
+  padding: 14px;
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.schedule-button:hover {
+  background-color: #166fe5;
+}
+
+
+/* --- Booking List Styles --- */
+.booking-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.booking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  background-color: #f7f7f7;
+}
+
+.booking-details p {
+  margin: 5px 0;
+  color: #333;
+}
+
+.event-name {
+    margin: 0 0 10px 0;
+    font-size: 1.25rem;
+    color: #1c1e21;
+}
+
+.customer-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tag {
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.tag.repeat-customer {
+    background-color: #e7f3ff;
+    color: #1877f2;
+}
+
+.tag.first-time {
+    background-color: #e4f7e4;
+    color: #008c00;
+}
+
+
+.cancel-button {
+  padding: 8px 16px;
+  background-color: #db3422;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-button:hover {
+  background-color: #b92b1a;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 900px) {
+    .admin-content {
+        grid-template-columns: 1fr; /* Stack columns on top of each other */
+    }
+}
+/* --- Theme Toggle Button --- */
+.theme-toggle-button {
+    position: absolute;
+    top: 0px;
+    right: 20px;
+    padding: 8px 16px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    border: 1px solid var(--border-color);
+    background-color: var(--container-bg);
+    color: var(--text-primary);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle-button:hover {
+    opacity: 0.8;
+    color:black;
+    background-color: white;
+}
