@@ -1,13 +1,14 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { collection, onSnapshot, addDoc, deleteDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase.js';
+import * as XLSX from 'xlsx';
 
-const ADMIN_PASSWORD = "admin";
+const ADMIN_PASSWORD = "admin123";
 
 function AdminHome() {
-    const navigate = useNavigate(); // Initialize navigate
+    const navigate = useNavigate();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState('');
@@ -20,7 +21,9 @@ function AdminHome() {
     const [startTime, setStartTime] = useState('');
     const [endTime, setEndTime] = useState('');
     const [formError, setFormError] = useState('');
+    const [isExporting, setIsExporting] = useState(false); // State for export button
     const today = new Date().toISOString().split('T')[0];
+    const passwordInputRef = useRef(null);
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -38,6 +41,12 @@ function AdminHome() {
         return () => unsubscribe();
     }, [isAuthenticated]);
 
+    useEffect(() => {
+        if (!isAuthenticated && passwordInputRef.current) {
+            passwordInputRef.current.focus();
+        }
+    }, [isAuthenticated]);
+
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
         if (password === ADMIN_PASSWORD) {
@@ -49,10 +58,9 @@ function AdminHome() {
         }
     };
 
-    // --- THIS IS THE UPDATED FUNCTION ---
     const handleLogout = () => {
-        setIsAuthenticated(false); // Revoke access
-        navigate('/');            // Navigate to the main home page
+        setIsAuthenticated(false);
+        navigate('/');
     };
 
     const handleScheduleEvent = async (e) => {
@@ -73,9 +81,32 @@ function AdminHome() {
 
     const handleCancelBooking = async (bookingId) => {
         if (window.confirm('Are you sure you want to cancel this booking?')) {
-            try { await deleteDoc(doc(db, 'bookings', bookingId)); } 
+            try { await deleteDoc(doc(db, 'bookings', bookingId)); }
             catch (error) { console.error("Error cancelling booking:", error); alert('Failed to cancel booking.'); }
         }
+    };
+
+    const handleExport = () => {
+        if (bookings.length === 0) {
+            alert("There are no bookings to export.");
+            return;
+        }
+        setIsExporting(true);
+        setTimeout(() => {
+            const worksheetData = bookings.map(booking => ({
+                'Event Name': booking.eventName,
+                'Customer Name': booking.customerName,
+                'Customer Email': booking.customerEmail,
+                'Date': booking.date,
+                'Start Time': booking.startTime,
+                'End Time': booking.endTime
+            }));
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+            XLSX.writeFile(workbook, "TheatreBookings.xlsx");
+            setIsExporting(false);
+        }, 2000);
     };
 
     if (!isAuthenticated) {
@@ -85,7 +116,7 @@ function AdminHome() {
                     <h2>Admin Access</h2>
                     <form onSubmit={handlePasswordSubmit}>
                         <label htmlFor="admin-password">Enter Password</label>
-                        <input type="password" id="admin-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
+                        <input ref={passwordInputRef} type="password" id="admin-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" />
                         <button type="submit">Enter</button>
                         {loginError && <p className="error-message">{loginError}</p>}
                     </form>
@@ -115,7 +146,12 @@ function AdminHome() {
                     </form>
                 </section>
                 <section className="list-section">
-                    <h2>Current Bookings</h2>
+                    <div className="list-header">
+                        <h2>Current Bookings</h2>
+                        <button onClick={handleExport} className="export-button" disabled={isExporting}>
+                            {isExporting ? 'Exporting...' : 'Export Events'}
+                        </button>
+                    </div>
                     <div className="booking-list">
                         {bookings.length > 0 ? bookings.map(booking => (
                             <div key={booking.id} className="booking-item">

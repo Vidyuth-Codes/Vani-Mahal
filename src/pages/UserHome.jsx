@@ -69,9 +69,23 @@ function UserHome() {
             <main className="checker-container">
                 <h2>Check Hall Availability</h2>
                 <div className="date-time-picker">
-                    <div className="input-group"><label htmlFor="date-picker">Select Date</label><input type="date" id="date-picker" value={date} onChange={(e) => setDate(e.target.value)} min={today} /></div>
-                    <div className="input-group"><label htmlFor="start-time">Start Time</label><input type="time" id="start-time" value={startTime} onChange={(e) => setStartTime(e.target.value)} /></div>
-                    <div className="input-group"><label htmlFor="end-time">End Time</label><input type="time" id="end-time" value={endTime} onChange={(e) => setEndTime(e.target.value)} /></div>
+                    {/* --- CHANGES START HERE --- */}
+                    {/* Each div is now a label, and the text is in a span */}
+                    <label htmlFor="date-picker" className="input-group">
+                        <span>Select Date</span>
+                        <input type="date" id="date-picker" value={date} onChange={(e) => setDate(e.target.value)} min={today} />
+                    </label>
+
+                    <label htmlFor="start-time" className="input-group">
+                        <span>Start Time</span>
+                        <input type="time" id="start-time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                    </label>
+
+                    <label htmlFor="end-time" className="input-group">
+                        <span>End Time</span>
+                        <input type="time" id="end-time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+                    </label>
+                    {/* --- CHANGES END HERE --- */}
                 </div>
                 <button className="check-button" onClick={handleCheckAvailability} disabled={isLoading}>
                     {isLoading ? 'Checking...' : 'Check Availability'}
@@ -86,4 +100,3 @@ function UserHome() {
 }
 
 export default UserHome;
-
