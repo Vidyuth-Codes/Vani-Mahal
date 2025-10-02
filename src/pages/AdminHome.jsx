@@ -5,7 +5,7 @@ import { collection, onSnapshot, addDoc, deleteDoc, doc, query, where, getDocs }
 import { db } from '../firebase.js';
 import * as XLSX from 'xlsx'; // Import the xlsx library
 
-const ADMIN_PASSWORD = "admin";
+const ADMIN_PASSWORD = "admin123";
 
 function AdminHome() {
     const navigate = useNavigate();
