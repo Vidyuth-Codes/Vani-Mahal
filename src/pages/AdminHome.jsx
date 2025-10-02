@@ -3,8 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, onSnapshot, addDoc, deleteDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase.js';
+import * as XLSX from 'xlsx'; // Import the xlsx library
 
-const ADMIN_PASSWORD = "admin123";
+const ADMIN_PASSWORD = "admin";
 
 function AdminHome() {
     const navigate = useNavigate();
@@ -19,10 +20,10 @@ function AdminHome() {
     const [customerName, setCustomerName] = useState('');
     const [customerEmail, setCustomerEmail] = useState('');
     const [date, setDate] = useState('');
-    // Replaced startTime and endTime with timeSlot
     const [timeSlot, setTimeSlot] = useState(''); 
     
     const [formError, setFormError] = useState('');
+    const [isExporting, setIsExporting] = useState(false); // State for export button
     const today = new Date().toISOString().split('T')[0];
     const passwordInputRef = useRef(null);
 
@@ -64,35 +65,27 @@ function AdminHome() {
         navigate('/');
     };
 
-    // --- UPDATED EVENT SCHEDULING LOGIC ---
     const handleScheduleEvent = async (e) => {
         e.preventDefault();
         setFormError('');
-
         try {
             const bookingsRef = collection(db, 'bookings');
             const q = query(bookingsRef, where("date", "==", date));
             const querySnapshot = await getDocs(q);
             const todaysBookings = querySnapshot.docs.map(doc => doc.data().time);
-
             let isBooked = false;
             if (timeSlot === 'Whole Day') {
                 if (todaysBookings.length > 0) isBooked = true;
-            } else { // FN or AN
+            } else {
                 if (todaysBookings.includes(timeSlot) || todaysBookings.includes('Whole Day')) isBooked = true;
             }
-
             if (isBooked) {
                 setFormError('This time slot is already booked. Please choose another time.');
                 return;
             }
-            
-            // Save the new booking with the 'time' field
             await addDoc(collection(db, 'bookings'), { 
                 eventName, customerName, customerEmail, date, time: timeSlot 
             });
-
-            // Reset form fields
             setEventName(''); setCustomerName(''); setCustomerEmail(''); setDate(''); setTimeSlot('');
         } catch (err) {
             console.error("Error scheduling event:", err);
@@ -105,6 +98,29 @@ function AdminHome() {
             try { await deleteDoc(doc(db, 'bookings', bookingId)); } 
             catch (error) { console.error("Error cancelling booking:", error); alert('Failed to cancel booking.'); }
         }
+    };
+
+    // --- ADDED EXPORT FUNCTION ---
+    const handleExport = () => {
+        if (bookings.length === 0) {
+            alert("There are no bookings to export.");
+            return;
+        }
+        setIsExporting(true);
+        setTimeout(() => {
+            const worksheetData = bookings.map(booking => ({
+                'Event Name': booking.eventName,
+                'Customer Name': booking.customerName,
+                'Customer Email': booking.customerEmail,
+                'Date': booking.date,
+                'Time Slot': booking.time // Use the new 'time' field
+            }));
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+            XLSX.writeFile(workbook, "TheatreBookings.xlsx");
+            setIsExporting(false);
+        }, 2000);
     };
 
     if (!isAuthenticated) {
@@ -139,35 +155,27 @@ function AdminHome() {
                         <div className="form-row"><div className="form-group"><label htmlFor="event-name">Event Name</label><input type="text" id="event-name" value={eventName} onChange={(e) => setEventName(e.target.value)} required /></div></div>
                         <div className="form-row"><div className="form-group"><label htmlFor="customer-name">Customer Name</label><input type="text" id="customer-name" value={customerName} onChange={(e) => setCustomerName(e.target.value)} required /></div><div className="form-group"><label htmlFor="customer-email">Customer Email</label><input type="email" id="customer-email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} required /></div></div>
                         <div className="form-row">
-                            <div className="form-group">
-                                <label htmlFor="date">Date</label>
-                                <input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required />
-                            </div>
-                            {/* --- REPLACED TIME INPUTS WITH DROPDOWN --- */}
-                            <div className="form-group">
-                                <label htmlFor="time-slot">Time Slot</label>
-                                <select id="time-slot" value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} required>
-                                    <option value="" disabled>-- Select --</option>
-                                    <option value="FN">FN (Forenoon)</option>
-                                    <option value="AN">AN (Afternoon)</option>
-                                    <option value="Whole Day">Whole Day</option>
-                                </select>
-                            </div>
+                            <div className="form-group"><label htmlFor="date">Date</label><input type="date" id="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required /></div>
+                            <div className="form-group"><label htmlFor="time-slot">Time Slot</label><select id="time-slot" value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} required><option value="" disabled>-- Select --</option><option value="FN">FN (Forenoon)</option><option value="AN">AN (Afternoon)</option><option value="Whole Day">Whole Day</option></select></div>
                         </div>
                         <button type="submit" className="schedule-button">Schedule Event</button>
                         {formError && <p className="error-message">{formError}</p>}
                     </form>
                 </section>
                 <section className="list-section">
-                    <h2>Current Bookings</h2>
-                    {/* The export function will need to be updated separately if needed */}
+                    {/* --- ADDED LIST HEADER WITH EXPORT BUTTON --- */}
+                    <div className="list-header">
+                        <h2>Current Bookings</h2>
+                        <button onClick={handleExport} className="export-button" disabled={isExporting}>
+                            {isExporting ? 'Exporting...' : 'Export Events'}
+                        </button>
+                    </div>
                     <div className="booking-list">
                         {bookings.length > 0 ? bookings.map(booking => (
                             <div key={booking.id} className="booking-item">
                                 <div className="booking-details">
                                     <h4 className="event-name">{booking.eventName}</h4>
                                     <p className="customer-info"><strong>Customer:</strong> {booking.customerName} ({booking.customerEmail}){customerBookingCounts[booking.customerEmail] > 1 ? (<span className="tag repeat-customer">Repeat ({customerBookingCounts[booking.customerEmail]})</span>) : (<span className="tag first-time">First-time</span>)}</p>
-                                    {/* --- UPDATED DISPLAY FOR TIME SLOT --- */}
                                     <p className="date-time-info"><strong>When:</strong> {booking.date} for {booking.time}</p>
                                 </div>
                                 <button onClick={() => handleCancelBooking(booking.id)} className="cancel-button">Cancel</button>
