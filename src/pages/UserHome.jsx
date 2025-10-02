@@ -8,8 +8,8 @@ const ADMIN_CONTACT_INFO = "+91 12345 67890";
 function UserHome() {
     const navigate = useNavigate();
     const [date, setDate] = useState('');
-    const [startTime, setStartTime] = useState('');
-    const [endTime, setEndTime] = useState('');
+    // State for the new time slot dropdown
+    const [timeSlot, setTimeSlot] = useState('');
     const [availability, setAvailability] = useState('idle');
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,24 +19,39 @@ function UserHome() {
         navigate('/admin');
     };
 
+    // --- THIS IS THE MAIN UPDATED FUNCTION ---
     const handleCheckAvailability = async () => {
-        if (date < today || !date || !startTime || !endTime || endTime <= startTime) {
-            setErrorMessage('Please select a valid, future date and time range.');
+        // Updated validation
+        if (date < today || !date || !timeSlot) {
+            setErrorMessage('Please select a valid, future date and a time slot.');
             setAvailability('error');
             return;
         }
         setErrorMessage('');
         setIsLoading(true);
         setAvailability('idle');
+
         try {
+            // 1. Get all bookings for the selected date
             const bookingsRef = collection(db, 'bookings');
             const q = query(bookingsRef, where("date", "==", date));
             const querySnapshot = await getDocs(q);
+            const todaysBookings = querySnapshot.docs.map(doc => doc.data().time);
+
             let isBooked = false;
-            querySnapshot.forEach((doc) => {
-                const booking = doc.data();
-                if (startTime < booking.endTime && endTime > booking.startTime) { isBooked = true; }
-            });
+            // 2. Implement the new conflict logic
+            if (timeSlot === 'Whole Day') {
+                // If user wants the whole day, it's booked if ANY slot is taken.
+                if (todaysBookings.length > 0) {
+                    isBooked = true;
+                }
+            } else { // User wants 'FN' or 'AN'
+                // It's booked if that specific slot is taken OR the whole day is taken.
+                if (todaysBookings.includes(timeSlot) || todaysBookings.includes('Whole Day')) {
+                    isBooked = true;
+                }
+            }
+
             setAvailability(isBooked ? 'booked' : 'available');
         } catch (error) {
             console.error("Error checking availability: ", error);
@@ -69,23 +84,25 @@ function UserHome() {
             <main className="checker-container">
                 <h2>Check Hall Availability</h2>
                 <div className="date-time-picker">
-                    {/* --- CHANGES START HERE --- */}
-                    {/* Each div is now a label, and the text is in a span */}
                     <label htmlFor="date-picker" className="input-group">
                         <span>Select Date</span>
                         <input type="date" id="date-picker" value={date} onChange={(e) => setDate(e.target.value)} min={today} />
                     </label>
 
-                    <label htmlFor="start-time" className="input-group">
-                        <span>Start Time</span>
-                        <input type="time" id="start-time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                    {/* --- REPLACED TIME INPUTS WITH A DROPDOWN --- */}
+                    <label htmlFor="time-slot-picker" className="input-group">
+                        <span>Select Time Slot</span>
+                        <select 
+                            id="time-slot-picker" 
+                            value={timeSlot} 
+                            onChange={(e) => setTimeSlot(e.target.value)}
+                        >
+                            <option value="" disabled>-- Select a Time --</option>
+                            <option value="FN">FN (Forenoon)</option>
+                            <option value="AN">AN (Afternoon)</option>
+                            <option value="Whole Day">Whole Day</option>
+                        </select>
                     </label>
-
-                    <label htmlFor="end-time" className="input-group">
-                        <span>End Time</span>
-                        <input type="time" id="end-time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-                    </label>
-                    {/* --- CHANGES END HERE --- */}
                 </div>
                 <button className="check-button" onClick={handleCheckAvailability} disabled={isLoading}>
                     {isLoading ? 'Checking...' : 'Check Availability'}
@@ -100,3 +117,4 @@ function UserHome() {
 }
 
 export default UserHome;
+

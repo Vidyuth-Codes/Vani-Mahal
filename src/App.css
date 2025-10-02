@@ -48,6 +48,15 @@ body {
   margin-bottom: 5px;
   color: #4b4f56;
 }
+select {
+  padding: 10px;
+  border: 1px solid #dddfe2;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white; /* Ensure it has a background */
+  width: 100%; /* Make it fill the container */
+  min-width: 180px; /* Give it a decent minimum width */
+}
 .input-group input { padding: 10px; border: 1px solid #dddfe2; border-radius: 6px; font-size: 1rem; }
 .check-button { padding: 12px 24px; background-color: #00a400; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1.1rem; font-weight: bold; transition: background-color 0.3s ease; }
 .check-button:hover { background-color: #008c00; }
